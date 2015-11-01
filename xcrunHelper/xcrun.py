@@ -65,7 +65,7 @@ class xcrun(object):
         location_style = CoreFoundation.CFPreferencesCopyAppValue('IDEBuildLocationStyle', 'com.apple.dt.Xcode');
         if location_style == 'Unique':
             xcodeproj_path = os.path.join(project.projectRoot.obj_path, project.name);
-            unique_path = xcrun_helper.hashStringForPath(xcodeproj_path);
+            unique_path = cls.hashStringForPath(xcodeproj_path);
             # this is missing the configuration path.
             project_dir_name = os.path.splitext(project.name)[0]+'-'+unique_path+'/Build/Products/';
             build_dir_path = os.path.join(derived_data, project_dir_name);
@@ -153,7 +153,7 @@ class xcrun(object):
     
     @classmethod
     def make_xcrun_with_args(cls, args_tuple):
-        xcrun_result = xcrun_helper.make_subprocess_call((('xcrun',) + args_tuple));
+        xcrun_result = cls.make_subprocess_call((('xcrun',) + args_tuple));
         if xcrun_result[1] != 0:
             print('[xcrun]: Error in exec!');
             sys.exit();
@@ -162,12 +162,12 @@ class xcrun(object):
     
     @classmethod
     def resolve_sdk_path(cls, sdk_name):
-        return xcrun_helper.make_xcrun_with_args(('--show-sdk-path', '--sdk', sdk_name));
+        return cls.make_xcrun_with_args(('--show-sdk-path', '--sdk', sdk_name));
     
     @classmethod
     def resolve_developer_path(cls):
         platform_path = '';
-        xcrun_result = xcrun_helper.make_subprocess_call(('xcode-select', '-p'));
+        xcrun_result = cls.make_subprocess_call(('xcode-select', '-p'));
         if xcrun_result[1] != 0:
             print('[xcrun]: Please run Xcode first!');
             sys.exit();
@@ -180,5 +180,5 @@ class xcrun(object):
         for item in scheme_config_settings:
             build_command+=str(item)+' ';
         build_command+=' '+type;
-        result = xcrun_helper.make_subprocess_call(build_command, True);
+        result = cls.make_subprocess_call(build_command, True);
         print result[0];
